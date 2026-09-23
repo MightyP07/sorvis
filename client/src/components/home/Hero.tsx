@@ -19,7 +19,7 @@ import {
 import { useState } from "react"
 import { useLocation } from "wouter"
 
-const ease = [0.16, 1, 0.3, 1]
+const ease = [0.16, 1, 0.3, 1] as const
 
 const discoveryFilters = [
   "Momentum",
@@ -154,7 +154,7 @@ function Hero() {
   const [, setLocation] = useLocation()
   const [query, setQuery] = useState("")
 
-  const handleSearch = (event) => {
+  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const trimmedQuery = query.trim()
@@ -169,7 +169,7 @@ function Hero() {
     )
   }
 
-  const handleFilter = (filter) => {
+  const handleFilter = (filter: string) => {
     setLocation(
       `/explore?filter=${encodeURIComponent(
         filter.toLowerCase(),

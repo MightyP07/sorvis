@@ -56,7 +56,7 @@ const mobileMenuVariants = {
     height: "auto",
     transition: {
       duration: 0.35,
-      ease: [0.16, 1, 0.3, 1],
+      ease: [0.16, 1, 0.3, 1] as const,
       when: "beforeChildren",
       staggerChildren: 0.055,
     },
@@ -66,7 +66,7 @@ const mobileMenuVariants = {
     height: 0,
     transition: {
       duration: 0.25,
-      ease: [0.65, 0, 0.35, 1],
+      ease: [0.65, 0, 0.35, 1] as const,
       when: "afterChildren",
     },
   },
@@ -82,7 +82,7 @@ const mobileItemVariants = {
     y: 0,
     transition: {
       duration: 0.3,
-      ease: [0.16, 1, 0.3, 1],
+      ease: [0.16, 1, 0.3, 1] as const,
     },
   },
 }
@@ -113,7 +113,7 @@ function Navbar() {
       animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.65,
-        ease: [0.16, 1, 0.3, 1],
+        ease: [0.16, 1, 0.3, 1] as const,
       }}
       className="fixed inset-x-0 top-0 z-50"
     >
@@ -170,7 +170,7 @@ function Navbar() {
                 whileHover={{ scale: 1.015 }}
                 transition={{
                   duration: 0.25,
-                  ease: [0.16, 1, 0.3, 1],
+                  ease: [0.16, 1, 0.3, 1] as const,
                 }}
                 className="flex items-center gap-3"
               >
@@ -221,7 +221,7 @@ function Navbar() {
                         transition={{
                           duration: 2.4,
                           repeat: Infinity,
-                          ease: "easeInOut",
+                          ease: "easeInOut" as const,
                         }}
                       />
                     </>
@@ -375,7 +375,7 @@ function Navbar() {
                     }}
                     transition={{
                       duration: 0.22,
-                      ease: [0.16, 1, 0.3, 1],
+                      ease: [0.16, 1, 0.3, 1] as const,
                     }}
                   >
                     <Sun className="h-[14px] w-[14px]" />
@@ -400,7 +400,7 @@ function Navbar() {
                     }}
                     transition={{
                       duration: 0.22,
-                      ease: [0.16, 1, 0.3, 1],
+                      ease: [0.16, 1, 0.3, 1 as const],
                     }}
                   >
                     <Moon className="h-[14px] w-[14px]" />
@@ -453,7 +453,7 @@ function Navbar() {
                   }}
                   transition={{
                     duration: 0.35,
-                    ease: [0.16, 1, 0.3, 1],
+                    ease: [0.16, 1, 0.3, 1] as const,
                   }}
                   className="
                     absolute inset-0
@@ -474,7 +474,7 @@ function Navbar() {
                   }}
                   transition={{
                     duration: 0.25,
-                    ease: [0.16, 1, 0.3, 1],
+                    ease: [0.16, 1, 0.3, 1] as const,
                   }}
                   className="relative z-10"
                 >

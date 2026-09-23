@@ -6,12 +6,10 @@ import {
   Compass,
   Database,
   GitBranch,
-  Layers3,
   Search,
   ShieldCheck,
   Sparkles,
   TrendingUp,
-  Users,
 } from "lucide-react"
 import { Link } from "wouter"
 
