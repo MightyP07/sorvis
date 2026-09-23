@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects Project[]
+}
+
+model Project {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String
+  website     String?
+  logoUrl     String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  ecosystems ProjectEcosystem[]
+
+  metrics      ProjectMetric[]
+  fundings     Funding[]
+  verification Verification?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([userId])
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  projects Project[]
+}
+
+model Ecosystem {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  projects ProjectEcosystem[]
+}
+
+model ProjectEcosystem {
+  projectId   String
+  ecosystemId String
+
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  ecosystem Ecosystem @relation(fields: [ecosystemId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, ecosystemId])
+  @@index([ecosystemId])
+}
+
+model ProjectMetric {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  momentumScore Int?
+  users         Int?
+  growth        Float?
+  tvl           Float?
+
+  recordedAt DateTime @default(now())
+
+  @@index([projectId])
+  @@index([recordedAt])
+}
+
+model Funding {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  round     String?
+  amount    Float?
+  currency  String?
+  investors String?
+
+  announcedAt DateTime?
+
+  @@index([projectId])
+}
+
+model Verification {
+  id        String  @id @default(cuid())
+  projectId String  @unique
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  isVerified Boolean   @default(false)
+  verifiedAt DateTime?
+  notes      String?
+}

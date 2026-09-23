@@ -1,0 +1,611 @@
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+@import "tailwindcss";
+
+/* =========================================================
+   SORVIS DESIGN SYSTEM
+   ========================================================= */
+
+:root {
+  /* =======================================================
+     Typography
+     ======================================================= */
+
+  --font-display: "Satoshi", "Manrope", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* =======================================================
+     SORVIS BRAND COLORS
+     ======================================================= */
+
+  /* Light Brand Palette */
+  --brand-blue-light: #0066ff;
+  --brand-teal-light: #00d1c6;
+  --brand-green-light: #00e676;
+  --brand-navy-light: #0b1f44;
+  --brand-sky-light: #3bb3ff;
+  --brand-mint-light: #a7f3d0;
+
+  /* Dark Blue Brand Palette */
+  --brand-blue-dark: #0ea5e9;
+  --brand-teal-dark: #14b8a6;
+  --brand-green-dark: #10b981;
+  --brand-cyan-dark: #22d3ee;
+  --brand-sky-dark: #38bdf8;
+  --brand-mint-dark: #20d4bf;
+  --brand-navy-dark: #071426;
+  --brand-slate-dark: #12233a;
+
+  /* =======================================================
+     Layout
+     ======================================================= */
+
+  --container-width: 1280px;
+  --page-padding: 24px;
+
+  --section-space-sm: 80px;
+  --section-space-md: 120px;
+  --section-space-lg: 160px;
+
+  /* =======================================================
+     Radius
+     ======================================================= */
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* =======================================================
+     Motion
+     ======================================================= */
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --duration-fast: 160ms;
+  --duration-normal: 280ms;
+  --duration-slow: 600ms;
+}
+
+
+/* =========================================================
+   DARK BLUE THEME
+   ========================================================= */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* -------------------------------------------------------
+     Backgrounds
+     ------------------------------------------------------- */
+
+  --bg-root: #050d18;
+  --bg-primary: #07111f;
+  --bg-secondary: #091626;
+  --bg-tertiary: #0c1b2e;
+  --bg-elevated: #102238;
+  --bg-hover: #142a43;
+
+  /* -------------------------------------------------------
+     Surfaces
+     ------------------------------------------------------- */
+
+  --surface-1: rgba(14, 165, 233, 0.025);
+  --surface-2: rgba(14, 165, 233, 0.045);
+  --surface-3: rgba(14, 165, 233, 0.07);
+  --surface-strong: rgba(14, 165, 233, 0.1);
+
+  --surface-glass: rgba(7, 17, 31, 0.76);
+  --surface-glass-heavy: rgba(5, 13, 24, 0.94);
+
+  /* -------------------------------------------------------
+     Borders
+     ------------------------------------------------------- */
+
+  --border-subtle: rgba(148, 197, 233, 0.08);
+  --border-default: rgba(148, 197, 233, 0.12);
+  --border-strong: rgba(148, 197, 233, 0.18);
+  --border-accent: rgba(14, 165, 233, 0.32);
+
+  /* -------------------------------------------------------
+     Text
+     ------------------------------------------------------- */
+
+  --text-primary: #f1f7ff;
+  --text-secondary: #9fb3c8;
+  --text-tertiary: #70859c;
+  --text-muted: #60758c;
+  --text-faint: #40566d;
+  --text-inverse: #03101c;
+
+  /* -------------------------------------------------------
+     Brand
+     ------------------------------------------------------- */
+
+  --accent: #0ea5e9;
+  --accent-hover: #38bdf8;
+  --accent-soft: rgba(14, 165, 233, 0.1);
+  --accent-strong: rgba(14, 165, 233, 0.18);
+
+  --brand-blue: #0ea5e9;
+  --brand-teal: #14b8a6;
+  --brand-green: #10b981;
+  --brand-cyan: #22d3ee;
+  --brand-sky: #38bdf8;
+  --brand-mint: #20d4bf;
+
+  --brand-navy: #071426;
+  --brand-slate: #12233a;
+
+  /* -------------------------------------------------------
+     Semantic
+     ------------------------------------------------------- */
+
+  --success: #10b981;
+  --success-soft: rgba(16, 185, 129, 0.1);
+
+  --warning: #facc15;
+  --warning-soft: rgba(250, 204, 21, 0.1);
+
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.1);
+
+  --info: #0ea5e9;
+  --info-soft: rgba(14, 165, 233, 0.1);
+
+  /* -------------------------------------------------------
+     Brand Gradients
+     ------------------------------------------------------- */
+
+  --brand-gradient:
+    linear-gradient(
+      135deg,
+      #0ea5e9 0%,
+      #14b8a6 52%,
+      #10b981 100%
+    );
+
+  --brand-gradient-soft:
+    linear-gradient(
+      135deg,
+      rgba(14, 165, 233, 0.16),
+      rgba(20, 184, 166, 0.1),
+      rgba(16, 185, 129, 0.08)
+    );
+
+  /* -------------------------------------------------------
+     Shadows
+     ------------------------------------------------------- */
+
+  --shadow-sm:
+    0 4px 20px rgba(0, 0, 0, 0.2);
+
+  --shadow-md:
+    0 12px 40px rgba(0, 0, 0, 0.32);
+
+  --shadow-lg:
+    0 24px 80px rgba(0, 0, 0, 0.48);
+
+  /* -------------------------------------------------------
+     Effects
+     ------------------------------------------------------- */
+
+  --glow-soft: rgba(14, 165, 233, 0.075);
+
+  --selection-bg: rgba(14, 165, 233, 0.24);
+  --selection-text: #f1f7ff;
+
+  /* -------------------------------------------------------
+     Background Atmosphere
+     ------------------------------------------------------- */
+
+  --body-gradient:
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(14, 165, 233, 0.09),
+      transparent 44%
+    ),
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(20, 184, 166, 0.035),
+      transparent 32%
+    );
+
+  --grid-line: rgba(148, 197, 233, 0.04);
+}
+
+
+/* =========================================================
+   LIGHT THEME
+   ========================================================= */
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* -------------------------------------------------------
+     Backgrounds
+     ------------------------------------------------------- */
+
+  --bg-root: #f5f7fa;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f7fa;
+  --bg-tertiary: #e2e8f0;
+  --bg-elevated: #ffffff;
+  --bg-hover: #e2e8f0;
+
+  /* -------------------------------------------------------
+     Surfaces
+     ------------------------------------------------------- */
+
+  --surface-1: rgba(255, 255, 255, 0.72);
+  --surface-2: rgba(0, 102, 255, 0.035);
+  --surface-3: rgba(0, 102, 255, 0.06);
+  --surface-strong: rgba(0, 102, 255, 0.085);
+
+  --surface-glass: rgba(255, 255, 255, 0.82);
+  --surface-glass-heavy: rgba(255, 255, 255, 0.96);
+
+  /* -------------------------------------------------------
+     Borders
+     ------------------------------------------------------- */
+
+  --border-subtle: rgba(148, 163, 184, 0.28);
+  --border-default: rgba(148, 163, 184, 0.4);
+  --border-strong: rgba(71, 85, 105, 0.28);
+  --border-accent: rgba(0, 102, 255, 0.32);
+
+  /* -------------------------------------------------------
+     Text
+     ------------------------------------------------------- */
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --text-muted: #94a3b8;
+  --text-faint: #cbd5e1;
+  --text-inverse: #ffffff;
+
+  /* -------------------------------------------------------
+     Brand
+     ------------------------------------------------------- */
+
+  --accent: #0066ff;
+  --accent-hover: #0052cc;
+  --accent-soft: rgba(0, 102, 255, 0.08);
+  --accent-strong: rgba(0, 102, 255, 0.14);
+
+  --brand-blue: #0066ff;
+  --brand-teal: #00d1c6;
+  --brand-green: #00e676;
+  --brand-navy: #0b1f44;
+  --brand-sky: #3bb3ff;
+  --brand-mint: #a7f3d0;
+
+  /* -------------------------------------------------------
+     Semantic
+     ------------------------------------------------------- */
+
+  --success: #00b85c;
+  --success-soft: rgba(0, 230, 118, 0.1);
+
+  --warning: #ca8a04;
+  --warning-soft: rgba(202, 138, 4, 0.09);
+
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, 0.09);
+
+  --info: #0066ff;
+  --info-soft: rgba(0, 102, 255, 0.09);
+
+  /* -------------------------------------------------------
+     Brand Gradients
+     ------------------------------------------------------- */
+
+  --brand-gradient:
+    linear-gradient(
+      135deg,
+      #0066ff 0%,
+      #00d1c6 52%,
+      #00e676 100%
+    );
+
+  --brand-gradient-soft:
+    linear-gradient(
+      135deg,
+      rgba(0, 102, 255, 0.1),
+      rgba(0, 209, 198, 0.08),
+      rgba(0, 230, 118, 0.07)
+    );
+
+  /* -------------------------------------------------------
+     Shadows
+     ------------------------------------------------------- */
+
+  --shadow-sm:
+    0 4px 20px rgba(15, 23, 42, 0.06);
+
+  --shadow-md:
+    0 12px 40px rgba(15, 23, 42, 0.09);
+
+  --shadow-lg:
+    0 24px 80px rgba(15, 23, 42, 0.13);
+
+  /* -------------------------------------------------------
+     Effects
+     ------------------------------------------------------- */
+
+  --glow-soft: rgba(0, 102, 255, 0.045);
+
+  --selection-bg: rgba(0, 102, 255, 0.16);
+  --selection-text: #0f172a;
+
+  /* -------------------------------------------------------
+     Background Atmosphere
+     ------------------------------------------------------- */
+
+  --body-gradient:
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(0, 102, 255, 0.045),
+      transparent 42%
+    );
+
+  --grid-line: rgba(71, 85, 105, 0.07);
+}
+
+
+/* =========================================================
+   GLOBAL
+   ========================================================= */
+
+html {
+  background: var(--bg-root);
+  color: var(--text-primary);
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+
+  background:
+    var(--body-gradient),
+    var(--bg-root);
+
+  color: var(--text-primary);
+
+  font-family: var(--font-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  transition:
+    background-color var(--duration-normal) ease,
+    color var(--duration-normal) ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+
+/* =========================================================
+   TYPOGRAPHY
+   ========================================================= */
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+
+/* =========================================================
+   SORVIS CONTAINER
+   ========================================================= */
+
+.sorvis-container {
+  width: min(
+    100% - (var(--page-padding) * 2),
+    var(--container-width)
+  );
+
+  margin-inline: auto;
+}
+
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+.sorvis-section {
+  padding-block: var(--section-space-md);
+}
+
+.sorvis-section-sm {
+  padding-block: var(--section-space-sm);
+}
+
+.sorvis-section-lg {
+  padding-block: var(--section-space-lg);
+}
+
+
+/* =========================================================
+   SURFACES
+   ========================================================= */
+
+.sorvis-surface {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+
+  transition:
+    background-color var(--duration-normal) ease,
+    border-color var(--duration-normal) ease,
+    box-shadow var(--duration-normal) ease;
+}
+
+.sorvis-surface:hover {
+  background: var(--surface-2);
+}
+
+.sorvis-glass {
+  background: var(--surface-glass);
+  border: 1px solid var(--border-subtle);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  box-shadow: var(--shadow-sm);
+
+  transition:
+    background-color var(--duration-normal) ease,
+    border-color var(--duration-normal) ease,
+    box-shadow var(--duration-normal) ease;
+}
+
+.sorvis-glass-heavy {
+  background: var(--surface-glass-heavy);
+  border: 1px solid var(--border-default);
+
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+
+  box-shadow: var(--shadow-md);
+}
+
+
+/* =========================================================
+   BRAND UTILITIES
+   ========================================================= */
+
+.sorvis-brand-gradient {
+  background: var(--brand-gradient);
+}
+
+.sorvis-brand-text {
+  background: var(--brand-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.sorvis-brand-glow {
+  box-shadow:
+    0 0 0 1px var(--accent-soft),
+    0 0 40px var(--glow-soft);
+}
+
+
+/* =========================================================
+   DIVIDERS
+   ========================================================= */
+
+.sorvis-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+
+/* =========================================================
+   TECHNICAL GRID
+   ========================================================= */
+
+.sorvis-grid {
+  background-image:
+    linear-gradient(
+      to right,
+      var(--grid-line) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      var(--grid-line) 1px,
+      transparent 1px
+    );
+
+  background-size: 48px 48px;
+}
+
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 640px) {
+  :root {
+    --page-padding: 16px;
+
+    --section-space-sm: 64px;
+    --section-space-md: 88px;
+    --section-space-lg: 120px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
