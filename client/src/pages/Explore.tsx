@@ -16,7 +16,6 @@ import {
   List,
   Loader2,
   Search,
-  SlidersHorizontal,
   Sparkles,
   X,
 } from "lucide-react"
@@ -124,11 +123,11 @@ type EcosystemsResponse = {
   data: Ecosystem[]
 }
 
-type ProjectResponse = {
-  success: boolean
-  data: Project
-  message?: string
-}
+// type ProjectResponse = {
+//   success: boolean
+//   data: Project
+//   message?: string
+// }
 
 type SortMode =
   | "relevance"
