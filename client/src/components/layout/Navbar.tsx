@@ -803,7 +803,7 @@ function Navbar() {
                   className="mt-2"
                 >
                   <Link
-                    href="/submit"
+                    href="/register"
                     onClick={closeMenu}
                     className="
                       group flex items-center
