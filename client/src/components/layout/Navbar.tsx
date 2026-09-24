@@ -424,8 +424,8 @@ function Navbar() {
               Sign in
             </Link>
 
-            {/* Submit */}
-            <Link href="/submit">
+            {/* Signup */}
+            <Link href="/register">
               <motion.div
                 whileHover="hover"
                 whileTap={{ scale: 0.97 }}
@@ -462,7 +462,7 @@ function Navbar() {
                 />
 
                 <span className="relative z-10">
-                  Submit project
+                  Register
                 </span>
 
                 <motion.span
@@ -797,7 +797,7 @@ function Navbar() {
                   </Link>
                 </motion.div>
 
-                {/* Submit */}
+                {/* Signup */}
                 <motion.div
                   variants={mobileItemVariants}
                   className="mt-2"
@@ -814,7 +814,7 @@ function Navbar() {
                     "
                   >
                     <span className="font-body text-sm font-semibold">
-                      Submit project
+                      Register
                     </span>
 
                     <motion.span
