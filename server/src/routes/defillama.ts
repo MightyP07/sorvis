@@ -26,25 +26,40 @@ router.get("/protocols", async (_req, res) => {
   }
 });
 
-router.post("/sync", async (_req, res) => {
+router.post("/sync", async (req, res) => {
   try {
-    console.log("Starting DeFiLlama sync...");
+    const offset = Math.max(
+      Number.parseInt(String(req.query.offset ?? "0"), 10) || 0,
+      0,
+    );
 
-    const result = await syncProtocols();
+    const limit = Math.min(
+      Math.max(
+        Number.parseInt(String(req.query.limit ?? "250"), 10) || 250,
+        1,
+      ),
+      250,
+    );
 
-    console.log("DeFiLlama sync completed:", result);
+    console.log(
+      `Starting DeFiLlama sync: offset=${offset}, limit=${limit}`,
+    );
+
+    const result = await syncProtocols(offset, limit);
+
+    console.log("DeFiLlama batch completed:", result);
 
     res.json({
       success: true,
-      message: "DeFiLlama projects synced successfully",
+      message: "DeFiLlama batch synced successfully",
       data: result,
     });
   } catch (error) {
-    console.error("Failed to sync DeFiLlama projects:", error);
+    console.error("Failed to sync DeFiLlama batch:", error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to sync DeFiLlama projects",
+      message: "Failed to sync DeFiLlama batch",
     });
   }
 });

@@ -31,19 +31,19 @@ const CATEGORY_MAP: Record<string, string> = {
   "Algo-Stables": "DeFi",
   "Stablecoin Issuer": "Payments",
   "Prediction Market": "DeFi",
-  "Insurance": "DeFi",
+  Insurance: "DeFi",
   "NFT Lending": "NFTs",
   "NFT Marketplace": "NFTs",
-  "NFTs": "NFTs",
+  NFTs: "NFTs",
   Gaming: "Gaming",
   "Gaming Lending": "Gaming",
   "NFT Aggregator": "NFTs",
   "NFT Launchpad": "NFTs",
   "Options Vault": "DeFi",
-  "Indexes": "DeFi",
+  Indexes: "DeFi",
   "Cross Chain": "Infrastructure",
-  "Infrastructure": "Infrastructure",
-  "Payments": "Payments",
+  Infrastructure: "Infrastructure",
+  Payments: "Payments",
   Social: "Social",
   DePIN: "DePIN",
   AI: "AI",
@@ -57,6 +57,22 @@ function slugify(value: string) {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function cleanUrl(value?: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+
+  const markdownMatch = trimmed.match(/^\[.*\]\((https?:\/\/[^)]+)\)$/);
+
+  if (markdownMatch) {
+    return markdownMatch[1] ?? null;
+  }
+
+  return trimmed;
 }
 
 function getSorvisCategory(defiLlamaCategory?: string | null) {
@@ -77,8 +93,13 @@ export async function fetchProtocols(): Promise<DefiLlamaProtocol[]> {
   return response.json() as Promise<DefiLlamaProtocol[]>;
 }
 
-export async function syncProtocols() {
+export async function syncProtocols(
+  offset = 0,
+  limit = 250,
+) {
   const protocols = await fetchProtocols();
+
+  const batch = protocols.slice(offset, offset + limit);
 
   const systemUser = await prisma.user.upsert({
     where: {
@@ -121,7 +142,7 @@ export async function syncProtocols() {
 
   const ecosystemNames = new Set<string>();
 
-  for (const protocol of protocols) {
+  for (const protocol of batch) {
     for (const chain of protocol.chains ?? []) {
       if (chain?.trim()) {
         ecosystemNames.add(chain.trim());
@@ -149,7 +170,7 @@ export async function syncProtocols() {
   let created = 0;
   let updated = 0;
 
-  for (const protocol of protocols) {
+  for (const protocol of batch) {
     if (!protocol.name || !protocol.slug) {
       continue;
     }
@@ -161,7 +182,7 @@ export async function syncProtocols() {
       continue;
     }
 
-    const slug = protocol.slug || slugify(protocol.name);
+    const slug = protocol.slug;
 
     const existing = await prisma.project.findUnique({
       where: {
@@ -181,8 +202,8 @@ export async function syncProtocols() {
         description:
           protocol.description?.trim() ||
           `${protocol.name} Web3 project.`,
-        website: protocol.url || null,
-        logoUrl: protocol.logo || null,
+        website: cleanUrl(protocol.url),
+        logoUrl: cleanUrl(protocol.logo),
         categoryId,
       },
       create: {
@@ -191,8 +212,8 @@ export async function syncProtocols() {
         description:
           protocol.description?.trim() ||
           `${protocol.name} Web3 project.`,
-        website: protocol.url || null,
-        logoUrl: protocol.logo || null,
+        website: cleanUrl(protocol.url),
+        logoUrl: cleanUrl(protocol.logo),
         userId: systemUser.id,
         categoryId,
       },
@@ -244,11 +265,17 @@ export async function syncProtocols() {
     }
   }
 
+  const nextOffset = offset + batch.length;
+  const hasMore = nextOffset < protocols.length;
+
   return {
     totalProtocols: protocols.length,
+    offset,
+    limit,
+    processed: batch.length,
+    nextOffset,
+    hasMore,
     created,
     updated,
-    categories: categories.size,
-    ecosystems: ecosystems.size,
   };
 }
