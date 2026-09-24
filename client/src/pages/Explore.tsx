@@ -20,7 +20,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useRef } from "react"
 import { useLocation } from "wouter"
 import Navbar from "../components/layout/Navbar"
 
@@ -41,13 +41,10 @@ type ProjectMetric = {
 }
 
 type Category = {
-  id: string
-  name: string
-  slug: string
-  _count?: {
-    projects: number
-  }
-}
+  name: string;
+  slug: string;
+  count: number;
+};
 
 type Ecosystem = {
   id: string
@@ -634,26 +631,178 @@ function FilterSelect({
   }>
   onChange: (value: string) => void
 }) {
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const selectedOption =
+    options.find((option) => option.value === value) ?? options[0]
+
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown)
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown)
+    }
+  }, [open])
+
   return (
     <label className="block">
       <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
         {label}
       </span>
 
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className="w-full appearance-none rounded-[11px] border border-[var(--border-subtle)] bg-[var(--surface-1)] px-3 py-2.5 pr-9 text-xs text-[var(--text-primary)] outline-none transition-colors focus:border-[var(--border-strong)]"
+      <div
+        ref={containerRef}
+        className="relative"
+      >
+        <button
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          onClick={() => setOpen((current) => !current)}
+          className="
+            flex
+            w-full
+            items-center
+            justify-between
+            gap-3
+            rounded-[11px]
+            border
+            border-[var(--border-subtle)]
+            bg-[var(--surface-1)]
+            px-3
+            py-2.5
+            text-left
+            text-xs
+            text-[var(--text-primary)]
+            outline-none
+            transition-all
+            duration-200
+            hover:border-[var(--border-default)]
+            hover:bg-[var(--surface-2)]
+            focus-visible:border-[var(--accent)]
+            focus-visible:ring-2
+            focus-visible:ring-[var(--accent-soft)]
+          "
         >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          <span className="min-w-0 truncate">
+            {selectedOption?.label ?? "Select"}
+          </span>
 
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
+          <ChevronDown
+            className={`
+              h-3.5
+              w-3.5
+              shrink-0
+              text-[var(--text-muted)]
+              transition-transform
+              duration-200
+              ${open ? "rotate-180" : ""}
+            `}
+          />
+        </button>
+
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: -4,
+                scale: 0.98,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: 1,
+              }}
+              exit={{
+                opacity: 0,
+                y: -4,
+                scale: 0.98,
+              }}
+              transition={{
+                duration: 0.16,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="
+                absolute
+                left-0
+                right-0
+                top-[calc(100%+6px)]
+                z-[60]
+                max-h-64
+                overflow-y-auto
+                rounded-[13px]
+                border
+                border-[var(--border-default)]
+                bg-[var(--surface-glass-heavy)]
+                p-1
+                shadow-[var(--shadow-md)]
+                backdrop-blur-[24px]
+              "
+              role="listbox"
+            >
+              {options.map((option) => {
+                const selected = option.value === value
+
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="option"
+                    aria-selected={selected}
+                    onClick={() => {
+                      onChange(option.value)
+                      setOpen(false)
+                    }}
+                    className={`
+                      flex
+                      w-full
+                      items-center
+                      justify-between
+                      gap-3
+                      rounded-[9px]
+                      px-3
+                      py-2.5
+                      text-left
+                      text-xs
+                      transition-colors
+                      duration-150
+                      ${
+                        selected
+                          ? "bg-[var(--accent-soft)] text-[var(--accent)]"
+                          : "text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]"
+                      }
+                    `}
+                  >
+                    <span className="min-w-0 truncate">
+                      {option.label}
+                    </span>
+
+                    {selected && (
+                      <span className="shrink-0 text-[var(--accent)]">
+                        <Check className="h-3.5 w-3.5" />
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </label>
   )
@@ -723,32 +872,54 @@ function FilterPanel({
   onChange: (filters: Filters) => void
   onClear: () => void
 }) {
-  const hasFilters =
-    filters.category ||
-    filters.ecosystem ||
-    filters.intelligence !== "all"
-
   return (
-    <aside className="sticky top-24 hidden h-fit w-[230px] shrink-0 lg:block">
-      <div className="rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-glass)] p-4 backdrop-blur-xl">
+    <aside className="hidden lg:block">
+      <div
+        className="
+          rounded-[20px]
+          border
+          border-[var(--border-default)]
+          bg-[var(--surface-glass)]
+          p-5
+          shadow-[var(--shadow-sm)]
+          backdrop-blur-[20px]
+          transition-colors
+          duration-300
+        "
+      >
         <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
-
-            <span className="text-xs font-semibold text-[var(--text-primary)]">
+          <div>
+            <div className="text-sm font-semibold text-[var(--text-primary)]">
               Filters
-            </span>
+            </div>
+
+            <div className="mt-1 text-[11px] text-[var(--text-muted)]">
+              Refine the current discovery view.
+            </div>
           </div>
 
-          {hasFilters && (
-            <button
-              type="button"
-              onClick={onClear}
-              className="text-[10px] text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]"
-            >
-              Clear
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onClear}
+            className="
+              rounded-[9px]
+              border
+              border-[var(--border-subtle)]
+              bg-[var(--surface-1)]
+              px-3
+              py-1.5
+              text-[11px]
+              font-medium
+              text-[var(--text-secondary)]
+              transition-all
+              duration-200
+              hover:border-[var(--border-accent)]
+              hover:bg-[var(--accent-soft)]
+              hover:text-[var(--accent)]
+            "
+          >
+            Reset
+          </button>
         </div>
 
         <div className="space-y-5">
@@ -760,8 +931,8 @@ function FilterPanel({
               ...categories.map((category) => ({
                 value: category.slug,
                 label: `${category.name}${
-                  category._count?.projects
-                    ? ` · ${formatNumber(category._count.projects)}`
+                  category.count
+                    ? ` · ${formatNumber(category.count)}`
                     : ""
                 }`,
               })),
@@ -830,6 +1001,7 @@ function MobileFilterSheet({
     }
 
     const originalOverflow = document.body.style.overflow
+
     document.body.style.overflow = "hidden"
 
     return () => {
@@ -848,17 +1020,52 @@ function MobileFilterSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-[80] bg-black/35 backdrop-blur-sm lg:hidden"
+            className="
+              fixed
+              inset-0
+              z-[80]
+              bg-[var(--bg-root)]/65
+              backdrop-blur-sm
+              lg:hidden
+            "
           />
 
           <motion.div
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 32 }}
-            className="fixed inset-x-0 bottom-0 z-[90] max-h-[82vh] overflow-y-auto rounded-t-[24px] border-t border-[var(--border-default)] bg-[var(--surface-glass-heavy)] p-5 shadow-2xl lg:hidden"
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 32,
+            }}
+            className="
+              fixed
+              inset-x-0
+              bottom-0
+              z-[90]
+              max-h-[82vh]
+              overflow-y-auto
+              rounded-t-[24px]
+              border-t
+              border-[var(--border-default)]
+              bg-[var(--surface-glass-heavy)]
+              p-5
+              shadow-[var(--shadow-lg)]
+              backdrop-blur-[24px]
+              lg:hidden
+            "
           >
-            <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-[var(--border-strong)]" />
+            <div
+              className="
+                mx-auto
+                mb-5
+                h-1
+                w-10
+                rounded-full
+                bg-[var(--border-strong)]
+              "
+            />
 
             <div className="mb-6 flex items-center justify-between">
               <div>
@@ -874,7 +1081,24 @@ function MobileFilterSheet({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-subtle)] text-[var(--text-secondary)]"
+                aria-label="Close filters"
+                className="
+                  flex
+                  h-9
+                  w-9
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-[var(--border-subtle)]
+                  bg-[var(--surface-1)]
+                  text-[var(--text-secondary)]
+                  transition-all
+                  duration-200
+                  hover:border-[var(--border-accent)]
+                  hover:bg-[var(--accent-soft)]
+                  hover:text-[var(--accent)]
+                "
               >
                 <X className="h-4 w-4" />
               </button>
@@ -889,8 +1113,8 @@ function MobileFilterSheet({
                   ...categories.map((category) => ({
                     value: category.slug,
                     label: `${category.name}${
-                      category._count?.projects
-                        ? ` · ${formatNumber(category._count.projects)}`
+                      category.count
+                        ? ` · ${formatNumber(category.count)}`
                         : ""
                     }`,
                   })),
@@ -932,11 +1156,36 @@ function MobileFilterSheet({
               />
             </div>
 
-            <div className="mt-6 flex gap-2 border-t border-[var(--border-subtle)] pt-4">
+            <div
+              className="
+                mt-6
+                flex
+                gap-2
+                border-t
+                border-[var(--border-subtle)]
+                pt-4
+              "
+            >
               <button
                 type="button"
                 onClick={onClear}
-                className="flex-1 rounded-[11px] border border-[var(--border-subtle)] px-4 py-3 text-xs text-[var(--text-secondary)]"
+                className="
+                  flex-1
+                  rounded-[11px]
+                  border
+                  border-[var(--border-subtle)]
+                  bg-[var(--surface-1)]
+                  px-4
+                  py-3
+                  text-xs
+                  font-medium
+                  text-[var(--text-secondary)]
+                  transition-all
+                  duration-200
+                  hover:border-[var(--border-accent)]
+                  hover:bg-[var(--accent-soft)]
+                  hover:text-[var(--accent)]
+                "
               >
                 Clear
               </button>
@@ -944,7 +1193,22 @@ function MobileFilterSheet({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 rounded-[11px] bg-[var(--text-primary)] px-4 py-3 text-xs font-medium text-[var(--text-inverse)]"
+                className="
+                  flex-1
+                  rounded-[11px]
+                  border
+                  border-[var(--border-accent)]
+                  bg-[var(--accent)]
+                  px-4
+                  py-3
+                  text-xs
+                  font-semibold
+                  text-white
+                  shadow-[0_8px_24px_var(--glow-soft)]
+                  transition-all
+                  duration-200
+                  hover:bg-[var(--accent-hover)]
+                "
               >
                 Apply
               </button>
@@ -1566,6 +1830,7 @@ export default function Explore() {
   const initial = getInitialState()
 
   const [search, setSearch] = useState(initial.search)
+
   const [filters, setFilters] = useState<Filters>({
     category: initial.category,
     ecosystem: initial.ecosystem,
@@ -1573,11 +1838,15 @@ export default function Explore() {
   })
 
   const [page, setPage] = useState(initial.page)
+
   const [view, setView] = useState<ViewMode>("grid")
+
   const [sort, setSort] = useState<SortMode>("relevance")
 
   const [projects, setProjects] = useState<Project[]>([])
+
   const [categories, setCategories] = useState<Category[]>([])
+
   const [ecosystems, setEcosystems] = useState<Ecosystem[]>([])
 
   const [pagination, setPagination] = useState<Pagination>({
@@ -1588,20 +1857,27 @@ export default function Explore() {
   })
 
   const [loading, setLoading] = useState(true)
+
   const [loadingTaxonomy, setLoadingTaxonomy] = useState(true)
+
   const [error, setError] = useState<string | null>(null)
 
   const [selectedProject, setSelectedProject] =
     useState<Project | null>(null)
 
   const [modalOpen, setModalOpen] = useState(false)
+
   const [modalLoading, setModalLoading] = useState(false)
-  const [modalError, setModalError] = useState<string | null>(null)
+
+  const [modalError, setModalError] =
+    useState<string | null>(null)
 
   const [mobileFiltersOpen, setMobileFiltersOpen] =
     useState(false)
 
-  const [searchInput, setSearchInput] = useState(initial.search)
+  const [searchInput, setSearchInput] = useState(
+    initial.search,
+  )
 
   const activeFilterCount =
     Number(Boolean(filters.category)) +
@@ -1639,18 +1915,22 @@ export default function Explore() {
 
     const query = params.toString()
 
-    setLocation(query ? `/explore?${query}` : "/explore")
+    setLocation(
+      query ? `/explore?${query}` : "/explore",
+    )
   }
 
   const fetchTaxonomy = async () => {
     setLoadingTaxonomy(true)
 
     try {
-      const [categoriesResponse, ecosystemsResponse] =
-        await Promise.all([
-          fetch(`${API_BASE}/api/categories`),
-          fetch(`${API_BASE}/api/ecosystems`),
-        ])
+      const [
+        categoriesResponse,
+        ecosystemsResponse,
+      ] = await Promise.all([
+        fetch(`${API_BASE}/api/categories`),
+        fetch(`${API_BASE}/api/ecosystems`),
+      ])
 
       if (!categoriesResponse.ok) {
         throw new Error("Failed to load categories.")
@@ -1667,14 +1947,19 @@ export default function Explore() {
         (await ecosystemsResponse.json()) as EcosystemsResponse
 
       if (!categoriesData.success) {
-        throw new Error("The category service returned an error.")
+        throw new Error(
+          "The category service returned an error.",
+        )
       }
 
       if (!ecosystemsData.success) {
-        throw new Error("The ecosystem service returned an error.")
+        throw new Error(
+          "The ecosystem service returned an error.",
+        )
       }
 
       setCategories(categoriesData.data || [])
+
       setEcosystems(ecosystemsData.data || [])
     } catch (taxError) {
       console.error(taxError)
@@ -1706,7 +1991,7 @@ export default function Explore() {
       }
 
       const response = await fetch(
-        `${API_BASE}/api/projects?${params.toString()}`,
+        `${API_BASE}/api/defillama/projects?${params.toString()}`,
       )
 
       if (!response.ok) {
@@ -1715,15 +2000,18 @@ export default function Explore() {
         )
       }
 
-      const result = (await response.json()) as ProjectsResponse
+      const result =
+        (await response.json()) as ProjectsResponse
 
       if (!result.success) {
         throw new Error(
-          result.message || "The project service returned an error.",
+          result.message ||
+            "The project service returned an error.",
         )
       }
 
       setProjects(result.data || [])
+
       setPagination(
         result.pagination || {
           page,
@@ -1764,7 +2052,9 @@ export default function Explore() {
     const timeout = window.setTimeout(() => {
       if (searchInput !== search) {
         setPage(1)
+
         setSearch(searchInput)
+
         updateUrl({
           nextSearch: searchInput,
           nextPage: 1,
@@ -1786,8 +2076,10 @@ export default function Explore() {
 
         switch (filters.intelligence) {
           case "momentum":
-            return metric?.momentumScore !== null &&
+            return (
+              metric?.momentumScore !== null &&
               metric?.momentumScore !== undefined
+            )
 
           case "growth":
             return (
@@ -1803,7 +2095,8 @@ export default function Explore() {
 
           case "funding":
             return Boolean(
-              project.fundings && project.fundings.length > 0,
+              project.fundings &&
+                project.fundings.length > 0,
             )
 
           default:
@@ -1814,6 +2107,7 @@ export default function Explore() {
 
     result.sort((a, b) => {
       const metricA = getLatestMetric(a)
+
       const metricB = getLatestMetric(b)
 
       switch (sort) {
@@ -1847,10 +2141,17 @@ export default function Explore() {
     })
 
     return result
-  }, [projects, filters.intelligence, sort])
+  }, [
+    projects,
+    filters.intelligence,
+    sort,
+  ])
 
-  const handleFiltersChange = (nextFilters: Filters) => {
+  const handleFiltersChange = (
+    nextFilters: Filters,
+  ) => {
     setFilters(nextFilters)
+
     setPage(1)
 
     updateUrl({
@@ -1868,6 +2169,7 @@ export default function Explore() {
     }
 
     setFilters(cleared)
+
     setPage(1)
 
     updateUrl({
@@ -1900,43 +2202,12 @@ export default function Explore() {
 
   const openProject = async (project: Project) => {
     setSelectedProject(project)
+
     setModalOpen(true)
-    setModalLoading(true)
+
+    setModalLoading(false)
+
     setModalError(null)
-
-    try {
-      const response = await fetch(
-        `${API_BASE}/api/project/${encodeURIComponent(
-          project.slug,
-        )}`,
-      )
-
-      if (!response.ok) {
-        throw new Error(
-          `Project request failed with status ${response.status}.`,
-        )
-      }
-
-      const result = (await response.json()) as ProjectResponse
-
-      if (!result.success) {
-        throw new Error(
-          result.message || "Unable to load project intelligence.",
-        )
-      }
-
-      setSelectedProject(result.data)
-    } catch (projectError) {
-      console.error(projectError)
-
-      setModalError(
-        projectError instanceof Error
-          ? projectError.message
-          : "Unable to load project intelligence.",
-      )
-    } finally {
-      setModalLoading(false)
-    }
   }
 
   const closeProject = () => {
@@ -1960,7 +2231,9 @@ export default function Explore() {
         <ExploreHeader
           search={searchInput}
           onSearchChange={setSearchInput}
-          onOpenFilters={() => setMobileFiltersOpen(true)}
+          onOpenFilters={() =>
+            setMobileFiltersOpen(true)
+          }
           activeFilterCount={activeFilterCount}
         />
 
@@ -2024,7 +2297,9 @@ export default function Explore() {
                     <button
                       type="button"
                       aria-label="Grid view"
-                      onClick={() => setView("grid")}
+                      onClick={() =>
+                        setView("grid")
+                      }
                       className={[
                         "flex h-8 w-8 items-center justify-center rounded-[8px] transition-colors",
                         view === "grid"
@@ -2038,7 +2313,9 @@ export default function Explore() {
                     <button
                       type="button"
                       aria-label="List view"
-                      onClick={() => setView("list")}
+                      onClick={() =>
+                        setView("list")
+                      }
                       className={[
                         "flex h-8 w-8 items-center justify-center rounded-[8px] transition-colors",
                         view === "list"
@@ -2055,27 +2332,39 @@ export default function Explore() {
               {loading ? (
                 view === "grid" ? (
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                    {Array.from({ length: 9 }).map((_, index) => (
-                      <LoadingCard key={index} index={index} />
-                    ))}
+                    {Array.from({ length: 9 }).map(
+                      (_, index) => (
+                        <LoadingCard
+                          key={index}
+                          index={index}
+                        />
+                      ),
+                    )}
                   </div>
                 ) : (
                   <div className="divide-y divide-[var(--border-subtle)] rounded-[16px] border border-[var(--border-subtle)]">
-                    {Array.from({ length: 8 }).map((_, index) => (
-                      <div
-                        key={index}
-                        className="flex animate-pulse items-center gap-4 px-5 py-5"
-                      >
-                        <div className="h-9 w-9 rounded-[10px] bg-[var(--surface-2)]" />
-                        <div className="flex-1">
-                          <div className="h-3 w-1/4 rounded bg-[var(--surface-2)]" />
-                          <div className="mt-2 h-2 w-1/3 rounded bg-[var(--surface-1)]" />
+                    {Array.from({ length: 8 }).map(
+                      (_, index) => (
+                        <div
+                          key={index}
+                          className="flex animate-pulse items-center gap-4 px-5 py-5"
+                        >
+                          <div className="h-9 w-9 rounded-[10px] bg-[var(--surface-2)]" />
+
+                          <div className="flex-1">
+                            <div className="h-3 w-1/4 rounded bg-[var(--surface-2)]" />
+
+                            <div className="mt-2 h-2 w-1/3 rounded bg-[var(--surface-1)]" />
+                          </div>
+
+                          <div className="h-3 w-16 rounded bg-[var(--surface-2)]" />
+
+                          <div className="h-3 w-16 rounded bg-[var(--surface-2)]" />
+
+                          <div className="h-3 w-16 rounded bg-[var(--surface-2)]" />
                         </div>
-                        <div className="h-3 w-16 rounded bg-[var(--surface-2)]" />
-                        <div className="h-3 w-16 rounded bg-[var(--surface-2)]" />
-                        <div className="h-3 w-16 rounded bg-[var(--surface-2)]" />
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 )
               ) : error ? (
@@ -2094,15 +2383,17 @@ export default function Explore() {
                 </div>
               ) : view === "grid" ? (
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {visibleProjects.map((project, index) => (
-                    <ProjectCard
-                      key={project.id}
-                      project={project}
-                      index={index}
-                      onOpen={openProject}
-                      view="grid"
-                    />
-                  ))}
+                  {visibleProjects.map(
+                    (project, index) => (
+                      <ProjectCard
+                        key={project.id}
+                        project={project}
+                        index={index}
+                        onOpen={openProject}
+                        view="grid"
+                      />
+                    ),
+                  )}
                 </div>
               ) : (
                 <div className="overflow-hidden rounded-[16px] border border-[var(--border-subtle)]">
@@ -2128,15 +2419,17 @@ export default function Explore() {
                     </span>
                   </div>
 
-                  {visibleProjects.map((project, index) => (
-                    <ProjectCard
-                      key={project.id}
-                      project={project}
-                      index={index}
-                      onOpen={openProject}
-                      view="list"
-                    />
-                  ))}
+                  {visibleProjects.map(
+                    (project, index) => (
+                      <ProjectCard
+                        key={project.id}
+                        project={project}
+                        index={index}
+                        onOpen={openProject}
+                        view="list"
+                      />
+                    ),
+                  )}
                 </div>
               )}
 
@@ -2156,8 +2449,8 @@ export default function Explore() {
           <div className="border-t border-[var(--border-subtle)] pt-5">
             <div className="flex flex-col gap-2 text-[10px] text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
               <span>
-                Sorvis indexes project data and associated intelligence
-                signals.
+                Sorvis indexes project data and associated
+                intelligence signals.
               </span>
 
               <span className="font-mono">
@@ -2172,7 +2465,9 @@ export default function Explore() {
 
       <MobileFilterSheet
         open={mobileFiltersOpen}
-        onClose={() => setMobileFiltersOpen(false)}
+        onClose={() =>
+          setMobileFiltersOpen(false)
+        }
         categories={categories}
         ecosystems={ecosystems}
         filters={filters}
@@ -2225,7 +2520,9 @@ export default function Explore() {
 
               <button
                 type="button"
-                onClick={() => setModalError(null)}
+                onClick={() =>
+                  setModalError(null)
+                }
                 className="ml-auto text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               >
                 <X className="h-3.5 w-3.5" />

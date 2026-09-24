@@ -1,5 +1,4 @@
 import { Router } from "express";
-
 import prisma from "../lib/prisma.js";
 
 const router = Router();
@@ -7,7 +6,9 @@ const router = Router();
 router.get("/", async (req, res) => {
   try {
     const search =
-      typeof req.query.search === "string" ? req.query.search.trim() : "";
+      typeof req.query.search === "string"
+        ? req.query.search.trim()
+        : "";
 
     const category =
       typeof req.query.category === "string"
@@ -30,7 +31,9 @@ router.get("/", async (req, res) => {
     const limit = Math.min(
       Math.max(
         Number.parseInt(
-          typeof req.query.limit === "string" ? req.query.limit : "20",
+          typeof req.query.limit === "string"
+            ? req.query.limit
+            : "20",
           10,
         ) || 20,
         1,
